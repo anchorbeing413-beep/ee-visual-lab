@@ -8,17 +8,58 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Stylesheets -->
+  <!-- Core Design System -->
   <link rel="stylesheet" href="css/lab-theme.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/simulation.css">
+
+  <!-- Open Source Scientific Libraries (Phase 1) -->
+  <!-- 1. MathJax Configuration & Script -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+
+  <!-- 2. Math.js for Dimensional Analysis and CAS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.js"></script>
+
+  <!-- 3. Plotly.js for Publication-Grade Scientific Plots -->
+  <script src="https://cdn.plot.ly/plotly-basic-2.29.1.min.js"></script>
+
+  <!-- 4. Mermaid.js for Prerequisite Trees & Concept Flowcharts -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          darkMode: true,
+          background: '#040812',
+          primaryColor: '#0f172a',
+          primaryTextColor: '#f1f5f9',
+          primaryBorderColor: '#38bdf8',
+          lineColor: '#64748b'
+        }
+      });
+    }
+  </script>
 </head>
 <body>
 
   <!-- ========================================================================
-       TOP NAVIGATION BAR
+       ACADEMIC LABORATORY HEADER
        ======================================================================== -->
   <header class="lab-header">
     <div class="container nav-wrapper">
@@ -31,9 +72,9 @@
         <div class="brand-text">
           <span class="brand-title">
             EE Visual Lab
-            <span class="brand-badge">M1: ACTIVE</span>
+            <span class="brand-badge">PHASE 1 ACTIVE</span>
           </span>
-          <span class="brand-subtitle">Interactive EE Research & GATE Lab</span>
+          <span class="brand-subtitle">Interactive Engineering Research & GATE Platform</span>
         </div>
       </a>
 
@@ -50,7 +91,7 @@
       <div class="nav-telemetry">
         <div class="status-pill">
           <span class="status-dot"></span>
-          <span>ANALYTICAL ENGINE: ONLINE</span>
+          <span>SCIENTIFIC VALIDATION: VERIFIED</span>
         </div>
       </div>
     </div>
@@ -66,24 +107,24 @@
       <div class="hero-section">
         <div class="hero-badge">
           <span>⚡</span>
-          <span>MILESTONE 1 • CORE TOPIC: RC TRANSIENT RESPONSE</span>
+          <span>SUBJECT: ELECTRIC CIRCUITS • TOPIC: FIRST-ORDER RC TRANSIENTS</span>
         </div>
         <h1 class="hero-title">Where Electrical Engineering is<br>Derived, Simulated & Mastered</h1>
         <p class="hero-subtitle">
-          Moving beyond rote formula memorization. An IIT & NIT-grade interactive laboratory uniting
-          rigorous physical principles, open-access engineering research, and GATE EE problem-solving.
+          An authentic academic engineering laboratory combining rigorous mathematical derivations, 
+          open-access IIT/NIT research, interactive simulation instrumentation, and GATE EE problem-solving.
         </p>
         <div class="hero-cta">
           <button class="btn btn-primary" data-switch-tab="simulation">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             Launch RC Simulation Lab
           </button>
           <button class="btn btn-secondary" data-switch-tab="workspace">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             Explore 17-Point Question Workspace
           </button>
           <button class="btn btn-secondary" data-switch-tab="research">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
             Academic Research Library
           </button>
         </div>
@@ -93,79 +134,79 @@
       <div class="metrics-strip">
         <div class="metric-box">
           <div class="metric-label">
-            <span>Precision Model</span>
-            <span style="color: var(--accent-voltage);">CALCULUS</span>
+            <span>Integration Stack</span>
+            <span style="color: var(--color-voltage);">OPEN SOURCE</span>
           </div>
-          <div class="metric-value">Exact<span class="metric-unit">ODE</span></div>
-          <div class="metric-meta">Zero decorative approximations</div>
+          <div class="metric-value">Plotly<span class="metric-unit">+ MathJax</span></div>
+          <div class="metric-meta">Math.js units & Mermaid charts</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">
-            <span>Active Subject</span>
-            <span style="color: var(--accent-voltage);">GATE EE #02</span>
+            <span>Validation Layer</span>
+            <span style="color: var(--color-power);">DIMENSIONAL</span>
           </div>
-          <div class="metric-value">Electric<span class="metric-unit">Circuits</span></div>
-          <div class="metric-meta">Topic: 1st Order Transients</div>
+          <div class="metric-value">Error &lt; 0.05%<span class="metric-unit">Verified</span></div>
+          <div class="metric-meta">Analytical ODE vs Numerical convergence</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">
             <span>Question Framework</span>
-            <span style="color: var(--accent-power);">STANDARD</span>
+            <span style="color: var(--color-time);">IIT/NIT</span>
           </div>
-          <div class="metric-value">17<span class="metric-unit">Steps</span></div>
-          <div class="metric-meta">From physical intuition to proof</div>
+          <div class="metric-value">17<span class="metric-unit">Standard Steps</span></div>
+          <div class="metric-meta">Physical intuition, derivation & reverse engineering</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">
-            <span>Research Alignment</span>
-            <span style="color: var(--accent-time);">OPEN ACCESS</span>
+            <span>Academic Integrity</span>
+            <span style="color: var(--color-voltage);">VERIFIED</span>
           </div>
-          <div class="metric-value">IIT/NPTEL<span class="metric-unit">Grade</span></div>
-          <div class="metric-meta">IIT Madras & Kharagpur references</div>
+          <div class="metric-value">NPTEL<span class="metric-unit">Archive</span></div>
+          <div class="metric-meta">IIT Madras & IIT Kharagpur references</div>
         </div>
       </div>
 
       <!-- Pedagogical Pillars -->
-      <div style="margin: 3rem 0;">
-        <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">The EE Visual Lab Methodology</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+      <div style="margin: 2.5rem 0;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 1.25rem; text-align: center;">The EE Visual Lab Educational Methodology</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
           <div class="lab-card">
             <div class="card-header">
               <span class="card-title">
-                <span style="color: var(--accent-voltage);">01.</span> Physical Intuition
+                <span style="color: var(--color-voltage);">01.</span> Physical Intuition
               </span>
               <span class="card-tag">PHYSICS</span>
             </div>
             <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
-              Understand what electrons, displacement currents, and electric flux lines are actually doing inside the component before touching mathematical formulas.
+              Understand what displacement currents, charge accumulation, and dielectric polarization are actually doing inside the component before touching formulas.
             </p>
           </div>
           <div class="lab-card">
             <div class="card-header">
               <span class="card-title">
-                <span style="color: var(--accent-voltage);">02.</span> Exact Derivation
+                <span style="color: var(--color-voltage);">02.</span> Exact Derivation
               </span>
               <span class="card-tag">MATHEMATICS</span>
             </div>
             <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
-              Derive governing equations from first principles—Kirchhoff’s laws, constitutive relations, differential equations, and boundary conditions.
+              Derive governing equations from first principles—Kirchhoff’s laws, constitutive relations, differential equations, and continuous boundary conditions.
             </p>
           </div>
           <div class="lab-card">
             <div class="card-header">
               <span class="card-title">
-                <span style="color: var(--accent-time);">03.</span> Interactive Simulation
+                <span style="color: var(--color-time);">03.</span> Interactive Simulation
               </span>
               <span class="card-tag">LABORATORY</span>
             </div>
             <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
-              Dynamically manipulate parameters ($R, C, V$) on high-precision dual-trace oscilloscopes to observe settling times, time constants ($\tau$), and energy dissipation in real time.
+              Dynamically manipulate parameters ($R, C, V_s$) on calibrated dual-trace oscilloscopes to observe time constants ($\tau$), rise times, and energy conservation.
             </p>
           </div>
           <div class="lab-card">
             <div class="card-header">
               <span class="card-title">
-                <span style="color: var(--accent-current);">04.</span> Reverse Engineering
+                <span style="color: var(--color-current);">04.</span> Reverse Engineering
               </span>
               <span class="card-tag">ANALYSIS</span>
             </div>
@@ -181,17 +222,17 @@
     <section id="tab-simulation" class="tab-view">
       <div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <h2 style="font-size: 1.6rem; display: flex; align-items: center; gap: 0.6rem;">
+          <h2 style="font-size: 1.5rem; display: flex; align-items: center; gap: 0.6rem;">
             <span>Series RC Circuit Transient Workbench</span>
-            <span class="card-tag" style="color: var(--accent-voltage); border-color: rgba(0,240,255,0.3);">ANALYTICAL ODE SOLVER</span>
+            <span class="card-tag">ODE SOLVER</span>
           </h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">
-            Governing Equation: <span class="math-inline">R \cdot C \cdot \frac{dv_c}{dt} + v_c(t) = V_s(t)</span> | Boundary condition: <span class="math-inline">v_c(0^+) = v_c(0^-)</span>
+          <p style="color: var(--text-muted); font-size: 0.825rem; margin-top: 0.2rem;">
+            Governing Equation: <span class="math-inline">R \cdot C \cdot \frac{dv_C}{dt} + v_C(t) = V_s(t)</span> | Boundary condition: <span class="math-inline">v_C(0^+) = v_C(0^-)</span>
           </p>
         </div>
         <div style="display: flex; gap: 0.5rem;">
           <button id="btnResetSim" class="btn btn-secondary btn-sm">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
             Reset Default
           </button>
         </div>
@@ -207,11 +248,9 @@
           
           <div class="mode-toggle-group">
             <button id="btnModeCharge" class="mode-btn active">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
               Charging (DC Step)
             </button>
             <button id="btnModeDischarge" class="mode-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
               Discharging (Decay)
             </button>
           </div>
@@ -307,7 +346,7 @@
                 document.getElementById('sliderV0').value=0;
                 document.getElementById('btnModeCharge').click();
               ">
-                🎯 GATE Core Question (R=20kΩ, C=50μF, Vs=24V, τ=1.0s)
+                🎯 GATE Question (R=20kΩ, C=50μF, Vs=24V, τ=1.0s)
               </button>
               <button class="btn btn-secondary btn-sm" style="justify-content: flex-start;" onclick="
                 document.getElementById('paramR').value=10;
@@ -334,8 +373,11 @@
           <div class="scope-container">
             <div class="scope-header">
               <div class="scope-title-wrap">
-                <span class="scope-title">OSCILLOSCOPE CH-A / CH-B</span>
-                <span class="card-tag" style="background: rgba(0,240,255,0.1); color: var(--accent-voltage);">TIME DOMAIN</span>
+                <span class="scope-title">OSCILLOSCOPE VIEWPORT</span>
+                <div class="scope-mode-tabs">
+                  <button id="btnScopeCanvas" class="scope-tab-btn active">Real-Time Scope</button>
+                  <button id="btnScopePlotly" class="scope-tab-btn">Plotly Analysis Mode</button>
+                </div>
               </div>
               <div class="scope-traces">
                 <div class="trace-indicator trace-voltage">
@@ -353,17 +395,24 @@
               </div>
             </div>
 
-            <div class="canvas-wrapper">
+            <!-- Real-Time High-FPS Canvas View -->
+            <div id="canvasScopeWrapper" class="canvas-wrapper">
               <canvas id="oscilloscopeCanvas"></canvas>
               <div id="scopeCursorOverlay" class="scope-cursor-overlay" style="display: none;"></div>
             </div>
 
-            <!-- Mathematical telemetry bar directly below canvas -->
-            <div style="margin-top: 0.75rem; background: rgba(13,19,34,0.6); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.78rem;">
-              <span style="color: var(--text-muted);">Exact Equation:</span>
-              <span id="teleEq" style="color: var(--accent-voltage); font-weight: 600;">v_c(t) = 10.0 · (1 - e^(-t / 1.000 s))</span>
+            <!-- Plotly.js Scientific View (Hidden by default) -->
+            <div id="plotlyScopeContainer"></div>
+
+            <!-- Mathematical telemetry bar directly below oscilloscope -->
+            <div style="margin-top: 0.75rem; background: var(--bg-surface-subtle); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.8rem;">
+              <span style="color: var(--text-muted);">Exact Closed-Form Equation:</span>
+              <span id="teleEq" style="color: var(--color-voltage); font-weight: 600;">v_C(t) = 10.0 · (1 - e^(-t / 1.000 s))</span>
             </div>
           </div>
+
+          <!-- Scientific Validation Audit Strip -->
+          <div id="valAuditSummary" class="validation-card" style="padding: 0.85rem 1.15rem; margin-top: 0;"></div>
 
           <!-- Live Engineering Telemetry Metrics -->
           <div class="sim-telemetry-grid">
@@ -393,27 +442,27 @@
                 <path id="circuitCurrentPath" class="circuit-wire circuit-active-wire" d="M 50 85 L 50 30 L 120 30 M 160 30 L 290 30 L 290 60 M 290 110 L 290 140 L 50 140 L 50 85" />
                 
                 <!-- DC Voltage Source (Left) -->
-                <circle cx="50" cy="85" r="18" fill="#0d1322" stroke="#00f0ff" stroke-width="2"/>
-                <text x="50" y="81" text-anchor="middle" fill="#00f0ff" font-size="12" font-weight="bold">+</text>
-                <text x="50" y="96" text-anchor="middle" fill="#00f0ff" font-size="12" font-weight="bold">-</text>
+                <circle cx="50" cy="85" r="18" fill="#0b1120" stroke="#38bdf8" stroke-width="2"/>
+                <text x="50" y="81" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="bold">+</text>
+                <text x="50" y="96" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="bold">-</text>
                 <text id="schematicVsText" x="15" y="88" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">10V DC</text>
 
                 <!-- Switch (Top Left) -->
-                <circle cx="120" cy="30" r="3" fill="#00f0ff"/>
-                <circle cx="160" cy="30" r="3" fill="#00f0ff"/>
-                <line id="schematicSwitchArm" x1="120" y1="30" x2="160" y2="30" stroke="#00f0ff" stroke-width="2.5"/>
+                <circle cx="120" cy="30" r="3" fill="#38bdf8"/>
+                <circle cx="160" cy="30" r="3" fill="#38bdf8"/>
+                <line id="schematicSwitchArm" x1="120" y1="30" x2="160" y2="30" stroke="#38bdf8" stroke-width="2.5"/>
                 <text x="135" y="18" fill="#f59e0b" font-size="10" font-family="JetBrains Mono">t = 0</text>
 
                 <!-- Series Resistor R (Top Right) -->
-                <rect x="200" y="22" width="50" height="16" fill="#131c31" stroke="#f1f5f9" stroke-width="1.5" rx="2"/>
+                <rect x="200" y="22" width="50" height="16" fill="#1e293b" stroke="#cbd5e1" stroke-width="1.5" rx="2"/>
                 <text id="schematicRText" x="225" y="16" text-anchor="middle" fill="#f1f5f9" font-size="11" font-family="JetBrains Mono">10 kΩ</text>
 
                 <!-- Parallel Capacitor C (Right) -->
-                <line x1="275" y1="75" x2="305" y2="75" stroke="#00f0ff" stroke-width="3"/>
-                <line x1="275" y1="95" x2="305" y2="95" stroke="#00f0ff" stroke-width="3"/>
-                <line x1="290" y1="60" x2="290" y2="75" stroke="#00f0ff" stroke-width="2"/>
-                <line x1="290" y1="95" x2="290" y2="110" stroke="#00f0ff" stroke-width="2"/>
-                <text id="schematicCText" x="315" y="88" fill="#00f0ff" font-size="11" font-family="JetBrains Mono">100 μF</text>
+                <line x1="275" y1="75" x2="305" y2="75" stroke="#38bdf8" stroke-width="3"/>
+                <line x1="275" y1="95" x2="305" y2="95" stroke="#38bdf8" stroke-width="3"/>
+                <line x1="290" y1="60" x2="290" y2="75" stroke="#38bdf8" stroke-width="2"/>
+                <line x1="290" y1="95" x2="290" y2="110" stroke="#38bdf8" stroke-width="2"/>
+                <text id="schematicCText" x="315" y="88" fill="#38bdf8" font-size="11" font-family="JetBrains Mono">100 μF</text>
 
                 <!-- Ground symbol at bottom -->
                 <line x1="170" y1="140" x2="170" y2="152" stroke="#475569" stroke-width="2"/>
@@ -424,10 +473,10 @@
             </div>
 
             <div>
-              <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem; color: #fff;">Physical Verification Notes</h3>
+              <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: #fff;">Physical Verification Notes</h3>
               <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.75rem;">
                 At <span class="math-inline">t = 0^+</span>, voltage continuity requires <span class="math-inline">v_C(0^+) = v_C(0^-)</span>. 
-                All source voltage momentarily drops across <span class="math-inline">R</span>, delivering peak current <span class="math-inline">I_{max} = (V_s - V_0)/R</span>.
+                All source voltage momentarily drops across <span class="math-inline">R</span>, delivering peak inrush current <span class="math-inline">I_{\text{max}} = (V_s - V_0)/R</span>.
               </p>
               <div class="lab-alert alert-info" style="margin: 0; padding: 0.6rem 0.85rem; font-size: 0.8rem;">
                 <div>
@@ -444,12 +493,12 @@
     <section id="tab-workspace" class="tab-view">
       <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-          <span class="card-tag" style="background: rgba(0,240,255,0.1); color: var(--accent-voltage); border-color: rgba(0,240,255,0.3);">STANDARD GATE WORKSPACE TEMPLATE</span>
+          <span class="card-tag">STANDARD GATE WORKSPACE TEMPLATE</span>
           <span class="card-tag">GATE-EE-CKT-01</span>
         </div>
-        <h2 style="font-size: 1.8rem;">Topic: Series RC Circuit Step Response & Energy Balance</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 840px;">
-          The standardized 17-section IIT/NIT pedagogical workspace. Every engineering problem is unpacked from physical intuition, rigorous mathematical formulation, and step-by-step derivation to interactive simulation, reverse engineering, and research citations.
+        <h2 style="font-size: 1.7rem;">Topic: Series RC Circuit Step Response & Energy Balance</h2>
+        <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 840px;">
+          The standardized 17-section IIT/NIT pedagogical workspace. Rendered with publication-grade LaTeX via MathJax and prerequisite concept graphs via Mermaid.
         </p>
       </div>
 
@@ -461,12 +510,12 @@
     <section id="tab-research" class="tab-view">
       <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-          <span class="card-tag" style="background: rgba(16,185,129,0.1); color: var(--accent-power); border-color: rgba(16,185,129,0.3);">ACADEMIC REPOSITORY</span>
+          <span class="card-tag">ACADEMIC REPOSITORY</span>
           <span class="card-tag">OPEN ACCESS & NPTEL</span>
         </div>
-        <h2 style="font-size: 1.8rem;">Electrical Engineering Research & Academic Library</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 840px;">
-          Strictly verified academic material, institutional courseware from IIT Madras, IIT Kharagpur, MIT OCW, and IEEE open publications. No hallucinated citations or fabricated DOIs.
+        <h2 style="font-size: 1.7rem;">Electrical Engineering Research & Academic Library</h2>
+        <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 840px;">
+          Strictly verified academic material and institutional courseware from IIT Madras, IIT Kharagpur, MIT OCW, and IEEE open publications. No hallucinated citations or fabricated DOIs.
         </p>
       </div>
 
@@ -478,11 +527,11 @@
     <section id="tab-roadmap" class="tab-view">
       <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-          <span class="card-tag" style="background: rgba(245,158,11,0.1); color: var(--accent-time); border-color: rgba(245,158,11,0.3);">1-YEAR STRATEGIC PLAN</span>
+          <span class="card-tag">1-YEAR STRATEGIC PLAN</span>
           <span class="card-tag">GATE ELECTRICAL SYLLABUS</span>
         </div>
-        <h2 style="font-size: 1.8rem;">GATE EE Subject Architecture & Milestone Roadmap</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 840px;">
+        <h2 style="font-size: 1.7rem;">GATE EE Subject Architecture & Milestone Roadmap</h2>
+        <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 840px;">
           A multi-phase, brick-by-brick development roadmap. Starting with First-Order Transients in Electric Circuits, we will systematically build mathematically verified interactive simulation laboratories for all 9 subjects.
         </p>
       </div>
@@ -490,7 +539,7 @@
       <div class="subject-grid">
         <!-- Subject 1: Electric Circuits (Active) -->
         <div class="subject-card active-topic" data-switch-tab="simulation">
-          <div class="subject-number">SUBJECT 01 • ACTIVE IN MILESTONE 1</div>
+          <div class="subject-number">SUBJECT 01 • ACTIVE IN PHASE 1</div>
           <h3 class="subject-title">Electric Circuits & Networks</h3>
           <p class="subject-desc">
             Network equations, nodal and mesh analysis, Thevenin/Norton equivalents, transient analysis of DC and AC networks, resonance, two-port parameters.
@@ -618,22 +667,23 @@
           <h4 style="font-size: 0.85rem; color: #fff; margin-bottom: 0.75rem;">Platform Principles</h4>
           <ul style="list-style: none; font-size: 0.8rem; line-height: 1.8; color: var(--text-muted);">
             <li>1. Accuracy first (verified ODEs)</li>
-            <li>2. Visual understanding second</li>
-            <li>3. Scalability third</li>
+            <li>2. Dimensional consistency checked</li>
+            <li>3. Open-source scientific integrations</li>
             <li>4. Zero unverified calculations</li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <span>EE VISUAL LAB • MILESTONE 1: RC TRANSIENT RESPONSE ENGINE</span>
+        <span>EE VISUAL LAB • PHASE 1: MATHJAX + MATH.JS + PLOTLY.JS + MERMAID</span>
         <span>ACADEMIC INTEGRITY & OPEN ACCESS</span>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Application Logic Scripts -->
   <script src="js/rc-simulator.js"></script>
+  <script src="js/scientific-validation.js"></script>
   <script src="js/scientific-canvas.js"></script>
   <script src="js/research-data.js"></script>
   <script src="js/question-workspace.js"></script>

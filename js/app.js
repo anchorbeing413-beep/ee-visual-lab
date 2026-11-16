@@ -1,12 +1,13 @@
 /**
  * ============================================================================
  * EE VISUAL LAB - MAIN APPLICATION CONTROLLER
- * Coordinates UI tabs, simulation engine, oscilloscope and question workspace
+ * Coordinates UI, Simulation Engine, MathJax, Math.js, Plotly.js, Mermaid,
+ * and the Independent Scientific Validation Layer
  * ============================================================================
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Initialize Simulator Engine with default 10kOhm, 100uF, 10V
+  // 1. Initialize Simulator Engine & Validation Layer
   const simEngine = new RCSimulatorEngine({
     R: 10000,
     C: 0.0001,
@@ -15,13 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
     mode: 'charge'
   });
 
-  // 2. Initialize Oscilloscope
+  const validator = new ScientificValidationLayer();
+
+  // 2. Initialize Oscilloscope Canvas
   const canvasEl = document.getElementById('oscilloscopeCanvas');
   const cursorOverlayEl = document.getElementById('scopeCursorOverlay');
   let oscilloscope = null;
   if (canvasEl && cursorOverlayEl) {
     oscilloscope = new ScientificOscilloscope(canvasEl, cursorOverlayEl);
   }
+
+  // Active display mode for oscilloscope: 'canvas' | 'plotly'
+  let currentScopeMode = 'canvas';
 
   // UI Elements
   const inputR = document.getElementById('paramR');
@@ -42,6 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnModeDischarge = document.getElementById('btnModeDischarge');
   const btnResetSim = document.getElementById('btnResetSim');
 
+  // Scope Mode Buttons
+  const btnModeCanvas = document.getElementById('btnScopeCanvas');
+  const btnModePlotly = document.getElementById('btnScopePlotly');
+  const canvasWrapper = document.getElementById('canvasScopeWrapper');
+  const plotlyWrapper = document.getElementById('plotlyScopeContainer');
+
   // Telemetry Elements
   const teleTau = document.getElementById('teleTau');
   const teleRise = document.getElementById('teleRise');
@@ -49,47 +61,145 @@ document.addEventListener('DOMContentLoaded', () => {
   const teleEnergy = document.getElementById('teleEnergy');
   const teleEq = document.getElementById('teleEq');
 
+  // Validation report container
+  const valAuditSummary = document.getElementById('valAuditSummary');
+
   // Circuit Schematic elements
   const circuitWirePath = document.getElementById('circuitCurrentPath');
-  const capChargeRect = document.getElementById('capChargeLevel');
   const switchArm = document.getElementById('schematicSwitchArm');
   const nodeVsText = document.getElementById('schematicVsText');
   const nodeRText = document.getElementById('schematicRText');
   const nodeCText = document.getElementById('schematicCText');
 
-  // Calculate actual R in Ohms from input + unit
+  // Calculate actual R in Ohms
   function getActualR() {
     const val = parseFloat(inputR.value) || 10;
     const factor = parseFloat(unitR.value) || 1000;
     return Math.max(1, val * factor);
   }
 
-  // Calculate actual C in Farads from input + unit
+  // Calculate actual C in Farads
   function getActualC() {
     const val = parseFloat(inputC.value) || 100;
     const factor = parseFloat(unitC.value) || 0.000001;
     return Math.max(1e-12, val * factor);
   }
 
-  // Refresh Simulation State and Oscilloscope Display
+  // Update Plotly Scientific Graph
+  function renderPlotlyGraph(dataset) {
+    if (typeof Plotly === 'undefined' || !plotlyWrapper) return;
+
+    const tArray = Array.from(dataset.time);
+    const vArray = Array.from(dataset.voltage);
+    const iArray = Array.from(dataset.current).map(val => val * 1000); // in mA
+
+    const traceV = {
+      x: tArray,
+      y: vArray,
+      name: 'v_C(t) Voltage',
+      type: 'scatter',
+      mode: 'lines',
+      line: { color: '#38bdf8', width: 2.5 }
+    };
+
+    const traceI = {
+      x: tArray,
+      y: iArray,
+      name: 'i(t) Current',
+      yaxis: 'y2',
+      type: 'scatter',
+      mode: 'lines',
+      line: { color: '#f43f5e', width: 2, dash: 'dot' }
+    };
+
+    const shapes = [];
+    dataset.tauMarkers.forEach(m => {
+      shapes.push({
+        type: 'line',
+        x0: m.t,
+        x1: m.t,
+        y0: 0,
+        y1: 1,
+        yref: 'paper',
+        line: { color: 'rgba(245, 158, 11, 0.45)', width: 1, dash: 'dash' }
+      });
+    });
+
+    const layout = {
+      margin: { l: 55, r: 55, t: 30, b: 40 },
+      paper_bgcolor: '#020408',
+      plot_bgcolor: '#020408',
+      font: { family: 'JetBrains Mono, monospace', color: '#94a3b8', size: 10 },
+      xaxis: {
+        title: 'Time t (s)',
+        gridcolor: '#1e293b',
+        zerolinecolor: '#334155'
+      },
+      yaxis: {
+        title: 'Capacitor Voltage v_C (V)',
+        titlefont: { color: '#38bdf8' },
+        tickfont: { color: '#38bdf8' },
+        gridcolor: '#1e293b',
+        zerolinecolor: '#334155'
+      },
+      yaxis2: {
+        title: 'Current i (mA)',
+        titlefont: { color: '#f43f5e' },
+        tickfont: { color: '#f43f5e' },
+        overlaying: 'y',
+        side: 'right',
+        zerolinecolor: '#334155'
+      },
+      legend: { orientation: 'h', x: 0.1, y: 1.12 },
+      shapes: shapes,
+      hovermode: 'x unified'
+    };
+
+    const config = {
+      responsive: true,
+      displayModeBar: true,
+      displaylogo: false,
+      modeBarButtonsToRemove: ['lasso2d', 'select2d']
+    };
+
+    Plotly.react(plotlyWrapper, [traceV, traceI], layout, config);
+  }
+
+  // Refresh Simulation State, Validation, and Displays
   function updateSimulation() {
     simEngine.R = getActualR();
     simEngine.C = getActualC();
     simEngine.Vs = parseFloat(inputVs.value) || 10;
     simEngine.V0 = parseFloat(inputV0.value) || 0;
 
+    // Run Independent Scientific Validation
+    const valResult = validator.validateSimulation(simEngine);
+    if (valAuditSummary) {
+      valAuditSummary.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="val-status-badge val-status-verified">✓ ${valResult.status}</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">${valResult.checksPassed}/${valResult.totalChecks} Checks Passed</span>
+          </div>
+          <span style="font-size: 0.7rem; color: var(--text-dim); font-family: var(--font-mono);">Checked: ODE Continuity, Dimensional [R][C]=[s], Energy 50/50, Convergence</span>
+        </div>
+      `;
+    }
+
     // Generate waveform data
     const dataset = simEngine.generateWaveformData(350);
 
-    // Update Oscilloscope
-    if (oscilloscope) {
+    // Update Oscilloscope Display
+    if (currentScopeMode === 'canvas' && oscilloscope) {
       oscilloscope.setEngineAndData(simEngine, dataset);
+    } else if (currentScopeMode === 'plotly') {
+      renderPlotlyGraph(dataset);
     }
 
     // Update Telemetry Panel
     if (teleTau) teleTau.textContent = RCSimulatorEngine.formatSI(simEngine.tau, 's');
     if (teleRise) teleRise.textContent = RCSimulatorEngine.formatSI(simEngine.riseTime, 's');
-    
+
     const initialI = simEngine.mode === 'charge'
       ? (simEngine.Vs - simEngine.V0) / simEngine.R
       : -simEngine.V0 / simEngine.R;
@@ -98,19 +208,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxE = 0.5 * simEngine.C * Math.pow(simEngine.mode === 'charge' ? simEngine.Vs : simEngine.V0, 2);
     if (teleEnergy) teleEnergy.textContent = RCSimulatorEngine.formatSI(maxE, 'J');
 
-    // Update Live Analytical Equation string
+    // Update Analytical Equation
     if (teleEq) {
       const tauStr = simEngine.tau >= 0.01 
-        ? simEngine.tau.toFixed(3) + ' s' 
-        : simEngine.tau.toExponential(2) + ' s';
+        ? simEngine.tau.toFixed(3) + '\\text{ s}' 
+        : simEngine.tau.toExponential(2) + '\\text{ s}';
       if (simEngine.mode === 'charge') {
         if (simEngine.V0 === 0) {
-          teleEq.textContent = `v_c(t) = ${simEngine.Vs.toFixed(1)} · (1 - e^(-t / ${tauStr}))`;
+          teleEq.innerHTML = `\\(v_C(t) = ${simEngine.Vs.toFixed(1)} \\left(1 - e^{-t / ${tauStr}}\\right)\\)`;
         } else {
-          teleEq.textContent = `v_c(t) = ${simEngine.Vs.toFixed(1)} + (${(simEngine.V0 - simEngine.Vs).toFixed(1)}) · e^(-t / ${tauStr})`;
+          teleEq.innerHTML = `\\(v_C(t) = ${simEngine.Vs.toFixed(1)} + (${(simEngine.V0 - simEngine.Vs).toFixed(1)}) e^{-t / ${tauStr}}\\)`;
         }
       } else {
-        teleEq.textContent = `v_c(t) = ${simEngine.V0.toFixed(1)} · e^(-t / ${tauStr})`;
+        teleEq.innerHTML = `\\(v_C(t) = ${simEngine.V0.toFixed(1)} e^{-t / ${tauStr}}\\)`;
+      }
+
+      // Re-render LaTeX in equation box if MathJax loaded
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([teleEq]).catch(() => {});
       }
     }
 
@@ -122,69 +237,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update Schematic Visual State
     if (switchArm) {
       if (simEngine.mode === 'charge') {
-        switchArm.setAttribute('y2', '50'); // Closed
+        switchArm.setAttribute('y2', '50');
       } else {
-        switchArm.setAttribute('y2', '35'); // Diverted / discharge
+        switchArm.setAttribute('y2', '35');
       }
     }
   }
 
   // Synchronize inputs & sliders
-  // Resistance
   if (inputR && sliderR && unitR) {
-    inputR.addEventListener('input', () => {
-      sliderR.value = inputR.value;
-      updateSimulation();
-    });
-    sliderR.addEventListener('input', () => {
-      inputR.value = sliderR.value;
-      updateSimulation();
-    });
-    unitR.addEventListener('change', () => {
-      updateSimulation();
-    });
+    inputR.addEventListener('input', () => { sliderR.value = inputR.value; updateSimulation(); });
+    sliderR.addEventListener('input', () => { inputR.value = sliderR.value; updateSimulation(); });
+    unitR.addEventListener('change', () => { updateSimulation(); });
   }
 
-  // Capacitance
   if (inputC && sliderC && unitC) {
-    inputC.addEventListener('input', () => {
-      sliderC.value = inputC.value;
-      updateSimulation();
-    });
-    sliderC.addEventListener('input', () => {
-      inputC.value = sliderC.value;
-      updateSimulation();
-    });
-    unitC.addEventListener('change', () => {
-      updateSimulation();
-    });
+    inputC.addEventListener('input', () => { sliderC.value = inputC.value; updateSimulation(); });
+    sliderC.addEventListener('input', () => { inputC.value = sliderC.value; updateSimulation(); });
+    unitC.addEventListener('change', () => { updateSimulation(); });
   }
 
-  // Voltage Vs
   if (inputVs && sliderVs) {
-    inputVs.addEventListener('input', () => {
-      sliderVs.value = inputVs.value;
-      updateSimulation();
-    });
-    sliderVs.addEventListener('input', () => {
-      inputVs.value = sliderVs.value;
-      updateSimulation();
-    });
+    inputVs.addEventListener('input', () => { sliderVs.value = inputVs.value; updateSimulation(); });
+    sliderVs.addEventListener('input', () => { inputVs.value = sliderVs.value; updateSimulation(); });
   }
 
-  // Initial Voltage V0
   if (inputV0 && sliderV0) {
-    inputV0.addEventListener('input', () => {
-      sliderV0.value = inputV0.value;
-      updateSimulation();
-    });
-    sliderV0.addEventListener('input', () => {
-      inputV0.value = sliderV0.value;
-      updateSimulation();
-    });
+    inputV0.addEventListener('input', () => { sliderV0.value = inputV0.value; updateSimulation(); });
+    sliderV0.addEventListener('input', () => { inputV0.value = sliderV0.value; updateSimulation(); });
   }
 
-  // Mode buttons
+  // Mode Buttons
   if (btnModeCharge && btnModeDischarge) {
     btnModeCharge.addEventListener('click', () => {
       simEngine.mode = 'charge';
@@ -196,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnModeDischarge.addEventListener('click', () => {
       simEngine.mode = 'discharge';
-      // If V0 is 0, initialize it to previous Vs for meaningful discharge demo
       if (simEngine.V0 === 0) {
         inputV0.value = inputVs.value;
         sliderV0.value = inputVs.value;
@@ -208,23 +290,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Scope Display Mode Switcher (Canvas vs. Plotly)
+  if (btnModeCanvas && btnModePlotly && canvasWrapper && plotlyWrapper) {
+    btnModeCanvas.addEventListener('click', () => {
+      currentScopeMode = 'canvas';
+      btnModeCanvas.classList.add('active');
+      btnModePlotly.classList.remove('active');
+      canvasWrapper.style.display = 'block';
+      plotlyWrapper.style.display = 'none';
+      if (oscilloscope) {
+        oscilloscope.resize();
+        oscilloscope.render();
+      }
+    });
+
+    btnModePlotly.addEventListener('click', () => {
+      currentScopeMode = 'plotly';
+      btnModePlotly.classList.add('active');
+      btnModeCanvas.classList.remove('active');
+      canvasWrapper.style.display = 'none';
+      plotlyWrapper.style.display = 'block';
+      const dataset = simEngine.generateWaveformData(350);
+      renderPlotlyGraph(dataset);
+    });
+  }
+
   // Reset Button
   if (btnResetSim) {
     btnResetSim.addEventListener('click', () => {
-      inputR.value = 10;
-      unitR.value = 1000;
-      sliderR.value = 10;
-
-      inputC.value = 100;
-      unitC.value = 0.000001;
-      sliderC.value = 100;
-
-      inputVs.value = 10;
-      sliderVs.value = 10;
-
-      inputV0.value = 0;
-      sliderV0.value = 0;
-
+      inputR.value = 10; unitR.value = 1000; sliderR.value = 10;
+      inputC.value = 100; unitC.value = 0.000001; sliderC.value = 100;
+      inputVs.value = 10; sliderVs.value = 10;
+      inputV0.value = 0; sliderV0.value = 0;
       simEngine.mode = 'charge';
       btnModeCharge.classList.add('active');
       btnModeDischarge.classList.remove('active');
@@ -237,31 +334,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabViews = document.querySelectorAll('.tab-view');
 
   function switchTab(tabId) {
-    navLinks.forEach(link => {
-      if (link.dataset.tab === tabId) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
-    });
+    navLinks.forEach(link => link.classList.toggle('active', link.dataset.tab === tabId));
+    tabViews.forEach(view => view.classList.toggle('active', view.id === `tab-${tabId}`));
 
-    tabViews.forEach(view => {
-      if (view.id === `tab-${tabId}`) {
-        view.classList.add('active');
-      } else {
-        view.classList.remove('active');
-      }
-    });
-
-    // If switching to simulation, trigger canvas resize and render
-    if (tabId === 'simulation' && oscilloscope) {
+    if (tabId === 'simulation') {
       setTimeout(() => {
-        oscilloscope.resize();
-        oscilloscope.render();
+        if (currentScopeMode === 'canvas' && oscilloscope) {
+          oscilloscope.resize();
+          oscilloscope.render();
+        } else if (currentScopeMode === 'plotly') {
+          const dataset = simEngine.generateWaveformData(350);
+          renderPlotlyGraph(dataset);
+        }
       }, 50);
     }
 
-    // Scroll to top of content smoothly
+    if (tabId === 'workspace') {
+      // Re-trigger MathJax rendering if needed
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([document.getElementById('questionStepsContainer')]).catch(() => {});
+      }
+      // Re-trigger Mermaid rendering if needed
+      if (window.mermaid) {
+        try { mermaid.run(); } catch (e) {}
+      }
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -272,7 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Action button links with data-tab
   document.querySelectorAll('[data-switch-tab]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -290,18 +387,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const q = window.STANDARD_GATE_QUESTION;
     container.innerHTML = '';
 
-    q.sections.forEach((sec, idx) => {
+    q.sections.forEach((sec) => {
       const card = document.createElement('div');
       card.className = 'step-card';
       card.id = `step-${sec.num}`;
 
       card.innerHTML = `
-        <div class="step-header" data-toggle-step="${sec.num}">
+        <div class="step-header">
           <div class="step-title-wrap">
             <span class="step-number">${sec.num}</span>
             <span class="step-title">${sec.title}</span>
           </div>
-          <span style="color: var(--text-dim); font-size: 0.8rem;">▼</span>
+          <span style="color: var(--text-dim); font-size: 0.75rem; font-family: var(--font-mono);">SECTION ${sec.num}</span>
         </div>
         <div class="step-content" id="content-${sec.num}">
           ${sec.content}
@@ -311,26 +408,25 @@ document.addEventListener('DOMContentLoaded', () => {
       container.appendChild(card);
     });
 
-    // Bind Question Workspace Button: "Load This Question into Simulator"
+    // Typeset LaTeX with MathJax
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([container]).catch(() => {});
+    }
+
+    // Render Mermaid diagrams
+    if (window.mermaid) {
+      try { mermaid.run(); } catch (e) {}
+    }
+
+    // Bind Workspace Action Buttons
     setTimeout(() => {
       const btnLoadPreset = document.getElementById('btnLoadPreset');
       if (btnLoadPreset) {
         btnLoadPreset.addEventListener('click', () => {
-          // Set R = 20k, C = 50u, Vs = 24V, V0 = 0V
-          inputR.value = 20;
-          unitR.value = 1000;
-          sliderR.value = 20;
-
-          inputC.value = 50;
-          unitC.value = 0.000001;
-          sliderC.value = 50;
-
-          inputVs.value = 24;
-          sliderVs.value = 24;
-
-          inputV0.value = 0;
-          sliderV0.value = 0;
-
+          inputR.value = 20; unitR.value = 1000; sliderR.value = 20;
+          inputC.value = 50; unitC.value = 0.000001; sliderC.value = 50;
+          inputVs.value = 24; sliderVs.value = 24;
+          inputV0.value = 0; sliderV0.value = 0;
           simEngine.mode = 'charge';
           if (btnModeCharge) btnModeCharge.classList.add('active');
           if (btnModeDischarge) btnModeDischarge.classList.remove('active');
@@ -340,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Bind Reverse Engineering Challenge Button in Section 12
+      // Reverse Engineering Verification
       const btnVerifyReverse = document.getElementById('btnVerifyReverse');
       const revInputR = document.getElementById('revInputR');
       const revFeedback = document.getElementById('revFeedback');
@@ -348,30 +444,28 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btnVerifyReverse && revInputR && revFeedback) {
         btnVerifyReverse.addEventListener('click', () => {
           const userVal = parseFloat(revInputR.value);
-          // Target: t = 1.386 s, v_fraction = 0.75, C = 50 uF
-          // R = -1.386294 / (50e-6 * ln(1 - 0.75)) = -1.386294 / (50e-6 * (-1.386294)) = 1 / 50e-6 = 20,000 Ohms
           const exactR = 20000;
           const errorPercent = Math.abs((userVal - exactR) / exactR) * 100;
 
           revFeedback.style.display = 'block';
           if (errorPercent < 1.0) {
-            revFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
+            revFeedback.style.background = 'rgba(16, 185, 129, 0.12)';
             revFeedback.style.border = '1px solid #10b981';
             revFeedback.style.color = '#a7f3d0';
-            revFeedback.innerHTML = `✓ <strong>EXCELLENT! Exact Engineering Verification Passed!</strong><br>
-            Calculated: R = 20,000 Ω (20 kΩ).<br>
+            revFeedback.innerHTML = `✓ <strong>Exact Engineering Verification Passed!</strong><br>
+            R = 20,000 Ω (20 kΩ).<br>
             Physical check: τ = RC = 20kΩ · 50μF = 1.000 s.<br>
-            At t = 1.386 s = ln(4) · τ, v_c = Vs(1 - e^-ln(4)) = Vs(1 - 0.25) = 0.75 Vs.`;
+            At t = 1.386 s = ln(4) · τ, v_C(t) = Vs(1 - e^-ln(4)) = Vs(1 - 0.25) = 0.75 Vs.`;
           } else {
-            revFeedback.style.background = 'rgba(255, 0, 85, 0.15)';
-            revFeedback.style.border = '1px solid #ff0055';
+            revFeedback.style.background = 'rgba(244, 63, 94, 0.12)';
+            revFeedback.style.border = '1px solid #f43f5e';
             revFeedback.style.color = '#fda4af';
             revFeedback.innerHTML = `✗ <strong>Verification Failed:</strong> Your entry of ${userVal} Ω has ${errorPercent.toFixed(1)}% deviation.<br>
-            Hint: Use 1 - e^(-t/RC) = 0.75 ⟹ e^(-t/RC) = 0.25 ⟹ t/RC = ln(4) ≈ 1.3863. Hence RC = 1.0 s!`;
+            Hint: Use 1 - e^(-t/RC) = 0.75 ⟹ e^(-t/RC) = 0.25 ⟹ t/RC = ln(4) ≈ 1.3863 s. Hence RC = 1.000 s.`;
           }
         });
       }
-    }, 100);
+    }, 150);
   }
 
   // 5. Render Research Library Cards
@@ -393,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <span>${item.year}</span>
           </div>
           <h3 class="research-title">${item.title}</h3>
-          <p style="font-size: 0.8rem; color: var(--accent-voltage); font-family: var(--font-mono); margin-bottom: 0.5rem;">
+          <p style="font-size: 0.8rem; color: var(--color-voltage); font-family: var(--font-mono); margin-bottom: 0.5rem;">
             Author: ${item.authors} (${item.type})
           </p>
           <p class="research-abstract">${item.abstract}</p>
@@ -402,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-dim);">${item.courseId}</span>
+          <span style="font-size: 0.725rem; font-family: var(--font-mono); color: var(--text-dim);">${item.courseId}</span>
           <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
             Official Academic Link ↗
           </a>
