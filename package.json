@@ -1,0 +1,21 @@
+{
+  "name": "ee-visual-lab",
+  "version": "1.0.0",
+  "description": "Interactive Electrical Engineering Research, Simulation and GATE Learning Platform",
+  "main": "serve.js",
+  "scripts": {
+    "start": "node serve.js",
+    "test": "node test/rc-simulator.test.js && node test/scientific-validation.test.js",
+    "validate": "node test/scientific-validation.test.js"
+  },
+  "keywords": [
+    "electrical-engineering",
+    "gate-ee",
+    "simulation",
+    "circuits",
+    "scientific-computing",
+    "research"
+  ],
+  "author": "EE Visual Lab Team",
+  "license": "Apache-2.0"
+}
